@@ -1,0 +1,193 @@
+\documentclass{article}
+\usepackage{amsmath,amsthm,amssymb}
+
+\newcommand{\sdiv}{\mathrm{div}}
+\newcommand{\scurl}{\mathrm{curl}}
+\newcommand{\sker}{\mathrm{ker}}
+\newcommand{\mainSection}[1]{\bigskip \noindent{\huge #1} \bigskip}
+
+\newcommand{\separateLine}[1]{\bigskip \noindent \textbf{#1} \bigskip}
+
+\begin{document}
+
+\noindent Victor de Fontnouvelle
+\\ 4/17/2018
+\begin{center}
+\textbf{Thesis Outline and Section}
+\end{center}
+
+\mainSection{Abstract}
+
+We will explore various methods of analyzing high-dimensional data. We'll investigate techniques that make inferences about the underlying structure of the data, cluster the data, or reduce the dimension of the data. We'll apply these methods to real-world datasets, compare the methods, and suggest improvements to the methods.
+
+\mainSection{Introduction}
+
+\separateLine{Inference About the Structure of the Data}
+
+Cohomology analysis and Helmholtz decomposition provide insight on the structure of the data. Cohomology analysis provides a broader framework for detecting clusters, holes, and higher-order features within the data. Helmholtz decomposition is a specific application of cohomology analysis which seeks to find an ordered list which best accounts for a weighted graph.
+
+\separateLine{Clustering}
+
+Mapper clusters the data, by mapping clusters of points onto intervals on the real line using a filter function, and connecting overlapping clusters.
+
+\separateLine{Dimensionality Reduction}
+
+Calculating the eigenvalues of the laplacian matrix reduces the dimension of the data. The laplacian is a symmetric matrix encoding the pairwise distances between points, normalized by row. This matrix can be thought of as a linear operator encoding heat flows. Given an input of initial temperatures, it outputs the changes in temperatures after one time step. Eigenvectors corresponding to low eigenvalues thus correspond to stable temperature configurations. The eigenvectors are perpendicular, and thus eigenvectors corresponding to slightly higher eigenvalues often capture geometric structure existing in the data. Additionally, nearby points will have similar values in the eigenvectors, and thus the eigenvectors are also a useful tool for reducing the dimension of the data.
+
+\separateLine{Review of Literature}
+
+Papers by Gunnar Carlsson \cite{carlssonMain} and Vin de Silva \cite{deSilvaCohomology} explain the intuition behind cohomolgy analysis, and provides several examples. Carlsson \cite{carlssonCompute} and deSilva \cite{deSilvaCohomology} also describe the algorithm used to compute cohomology, which will be useful if I choose to implement it.
+
+Curto \cite{curto} and Ulmer \cite{biologicalModels} both provide various examples of the uses of homology analysis, both in detecting underlying structure, and in providing fingerprints that identify different phenomena. Curto analyzes a dataset representing connection strengths between neurons in rats responsible for spatial recognition. Curto first keeps a certain proportion of edges $\rho$ s.t. $0<\rho<1$, keeping those edges which are the strongest. Curto then runs cohomology analysis on this graph to determine the Betti curve. Curto determined that the Betti curve obtained from spatially organized neurons is different than the Betti curve that would be obtained from neurons with random structure. Cohomolgy analysis thus provides a method for detecting spatial neurons. Ulmer uses cohomology analysis to evaluate two different models of social interaction for aphids roaming in a dish. Standard measures that compare the models to real data include angular momentum, and average distance to closest neighbor. Ulmer found that cohomology analysis provided an equally strong measurement for assessing model accuracy.
+
+A paper by Jiang \cite{hodge} explains the Helmholtz decomposition that converts ranked data into ordinal data. It provides both the algorithm for the decomposition, as well as three examples of its use. Jiang uses Helmholtz decomposition to rank movies. Most users rate several movies, so each time a user rated two movies, this introduced an edge from one movie to the other indicating the user's preference. Jiang used Helmholtz decomposition to create an absolute index of currency values based off trading rates. Jiang also used Helmholtz decomposition to rank websites based off of connection strengths. Jiang found that Helmholtz decomposition performed as well as some of the standard methods for website ranking, indicating that it is a useful tool.
+
+Carlsson \cite{carlssonMain} also explains the Mapper tool, and provides examples of its use. I have already used the algorithm described in this paper to analyze several datasets.
+
+Singh \cite{laplacian} describes the intuition behind the laplacian analysis, which I have also implemented.
+
+\bigskip
+\noindent{\huge Explanation of Cohomology Analysis}
+\bigskip
+
+\bigskip
+\noindent{\huge Explanation of Helmholtz Decomposition}
+\bigskip
+
+\separateLine{Intuition}
+
+The Hodge Decomposition Theorem provides that $\bar{Y}$ can be expressed as the sum of three orthogonal components:
+
+\begin{enumerate}
+	\item The gradient flow $G$
+	\item The curl flow $C$
+	\item The harmonic flow $H$
+\end{enumerate}
+
+The gradient flow $G$ represents a comparison matrix that corresponds directly to a vector $v$ where each item is assigned a real value.
+$G$ is the gradient of $v$, thus each entry is computed as $G[ij] = v[j] - v[i]$.
+
+The harmonic flow $H$ represents a ranking that is curl-free and divergence-free.
+This means that any three items in $H$ will have pairwise rankings that are logically consistent.
+Specifically, $H[ij] + H[jk] + H[ki] = 0, \forall i,j,k$.
+Because $\sdiv(H)=0$, $H$ contains plausible values in the sense that it could have been produced by real-world data.
+A harmonic flow thus indicates that there are cycles in the graph with more than three edges, where the edge weights don't sum to zero.
+
+The curl flow $C$ is the image of $\scurl^*$, the adjoint of the curl.
+Nonzero values of C thus indicate cycles of length three whose edge weights don't sum to zero.
+
+The gradient flow provides the ranking that minimizes the least-squared residual, while the harmonic and curl flows characterize the residual.
+Specifically, $\bar{Y} - H = G + C$.
+A large curl flow indicates that the ordering of items ranked closely together is unreliable,
+while a large harmonic flow indicates that the ordering of items ranked further apart is unreliable.
+For example, if the curl flow is large but the harmonic flow is small, this indicates that the ranking is valid at a larger scare,
+but that the specific ordering of closely-ranked alternatives isn't very precise.
+
+\separateLine{Computation of $G$, $C$, and $H$}
+
+\underline{Gradient flow:}
+We seek to find $S \in \mathbb{R}^n$ that minimizes $\lvert\lvert \delta_0s - \bar{Y} \rvert\rvert$.
+Such an $s$ must satisfy $\bar{Y} - \delta_0s \in \delta_0^\perp = \sker(\delta_0^*)$.
+Thus $\delta_0^*(\bar{Y} - \delta_0s) = 0 \implies \delta_0^* \delta_0 s = \delta_0 \bar{Y}$.
+Note that $\Delta_0 = \delta_0^* \delta_0$ and $\delta_0^* s = -\sdiv$, thus $s = -\delta_0^+\sdiv Y$.
+We compute the gradient flow as $G = \delta_0s$.
+
+\bigskip
+
+\underline{Curl flow:}
+We seek a three-dimensional matrix M that minimizes $\lvert\lvert \delta_1*M - \bar{Y} \rvert\rvert$.
+By similar logic, $\scurl \, \scurl^*M = \scurl Y \implies M = (\scurl \, \scurl^*)^{-1} \scurl Y$.
+Thus the curl flow $C = \scurl^* (\scurl \, \scurl^*)^{-1} \scurl Y = \scurl^+ \scurl Y$.
+We represent the curl matrix as a matrix with width $\binom{n}{2}$ and height $\binom{n}{3}$,
+which transforms a vector holding all entries $\bar{Y}[ij]$ s.t. $j>i$ and outputs a vector corresponding to all triples $(i,j,k)$ s.t. $i<j<k$.
+A triple $(i,j,k)$ will be assigned the value $\bar{Y}[ij] + \bar{Y}[jk] + \bar{Y}[ki]$.
+For example, in the case of four variables, we have 
+
+\[
+  \begin{bmatrix}
+    1 & -1 & 0 & 1 & 0 & 0 \\
+    1 & 0 & -1 & 0 & 1 & 0 \\
+    0 & 1 & -1 & 0 & 0 & 1 \\
+    0 & 0 & 0 & 1 & -1 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    ab \\ ac \\ ad \\ bc \\ bd \\ cd
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    abc \\ abd \\ acd \\ bcd
+  \end{bmatrix}
+\]
+
+To check correctness, we examine the triple $(a,b,c)$.
+This triple is assigned the value $\bar{Y}[ab] - \bar{Y}[ac] + \bar{Y}[bc]$.
+This equals $\bar{Y}[ac] + \bar{Y}[bc] + \bar{Y}[ca]$, as $- \bar{Y}[ac] = \bar{Y}[ca]$ since $\bar{Y}$ is symmetric.
+This is the curl, as we expect.
+
+\bigskip
+
+\underline{Harmonic flow:}
+The Hodge decomposition theorem provides that $\bar{Y} = G + H + C$, thus we compute $H$ as $\bar{Y} - G - H$.
+
+\mainSection{Application of Helmholtz Decomposition}
+
+\mainSection{Explanation of Mapper}
+
+\mainSection{Explanation of Laplacian Eigen-Analysis}
+
+\mainSection{Application of Laplacian Eigen-Analysis}
+
+\mainSection{Discussion}
+
+\mainSection{Conclusion}
+
+\begin{thebibliography}{9}
+
+
+\bibitem{carlssonMain}
+Carlsson, Gunnar.
+"Topology and data."
+\textit{Bulletin of the American Mathematical Society}
+46.2 (2009): 255-308.
+
+\bibitem{carlssonCompute}
+Zomorodian, Afra, and Gunnar Carlsson.
+"Computing persistent homology."
+\textit{Discrete \& Computational Geometry}
+33.2 (2005): 249-274.
+
+\bibitem{deSilvaCohomology}
+De Silva, Vin, Dmitriy Morozov, and Mikael Vejdemo-Johansson.
+"Persistent cohomology and circular coordinates."
+\textit{Discrete \& Computational Geometry}
+45.4 (2011): 737-759.
+
+
+\bibitem{curto}
+Giusti, Chad, et al.
+"Clique topology reveals intrinsic geometric structure in neural correlations."
+\textit{Proceedings of the National Academy of Sciences}
+112.44 (2015): 13455-13460.
+
+\bibitem{biologicalModels}
+Ulmer, M., Lori Ziegelmeier, and Chad M. Topaz.
+"Assessing biological models using topological data analysis."
+\textit{arXiv preprint arXiv:1811.04827}
+(2018).
+
+
+\bibitem{hodge} 
+Jiang, Xiaoye, et al. "Statistical ranking and combinatorial Hodge theory."
+\textit{Mathematical Programming}
+127.1 (2011): 203-244.
+
+
+\bibitem{laplacian}
+Singh, Gurjeet, Facundo Mémoli, and Gunnar E. Carlsson.
+"Topological methods for the analysis of high dimensional data sets and 3d object recognition."
+\textit{SPBG.}
+2007.
+
+\end{thebibliography}
+
+\end{document}
