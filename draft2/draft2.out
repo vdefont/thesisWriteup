@@ -1,0 +1,23 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Inference About the Structure of the Data}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Clustering}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.3}{Dimensionality Reduction}{chapter.1}% 4
+\BOOKMARK [0][-]{chapter.2}{Review of Literature}{}% 5
+\BOOKMARK [0][-]{chapter.3}{Helmholtz Decomposition}{}% 6
+\BOOKMARK [1][-]{section.3.1}{Explanation of Helmholtz Decomposition}{chapter.3}% 7
+\BOOKMARK [2][-]{subsection.3.1.1}{Intuition}{section.3.1}% 8
+\BOOKMARK [2][-]{subsection.3.1.2}{Computation of Gradient Flow}{section.3.1}% 9
+\BOOKMARK [2][-]{subsection.3.1.3}{Computation of Curl Flow}{section.3.1}% 10
+\BOOKMARK [2][-]{subsection.3.1.4}{Computation of Harmonic Flow}{section.3.1}% 11
+\BOOKMARK [1][-]{section.3.2}{Application of Helmholtz Decomposition}{chapter.3}% 12
+\BOOKMARK [0][-]{chapter.4}{Cohomology Analysis}{}% 13
+\BOOKMARK [1][-]{section.4.1}{Explanation of Cohomology Analysis}{chapter.4}% 14
+\BOOKMARK [1][-]{section.4.2}{Application of Cohomology Analysis}{chapter.4}% 15
+\BOOKMARK [0][-]{chapter.5}{Mapper}{}% 16
+\BOOKMARK [1][-]{section.5.1}{Explanation of Mapper}{chapter.5}% 17
+\BOOKMARK [1][-]{section.5.2}{Explanation of Mapper}{chapter.5}% 18
+\BOOKMARK [0][-]{chapter.6}{Laplacian Eigenvector Analysis}{}% 19
+\BOOKMARK [1][-]{section.6.1}{Explanation of Laplacian Eigenvector Analysis}{chapter.6}% 20
+\BOOKMARK [1][-]{section.6.2}{Application of Laplacian Eigenvector Analysis}{chapter.6}% 21
+\BOOKMARK [0][-]{chapter.7}{Discussion}{}% 22
+\BOOKMARK [0][-]{chapter.8}{Conclusion}{}% 23
