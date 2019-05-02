@@ -3,6 +3,8 @@
 \newcommand{\sdiv}{\mathrm{div}}
 \newcommand{\scurl}{\mathrm{curl}}
 \newcommand{\sker}{\mathrm{ker}}
+\newcommand{\ssim}{\mathrm{im}}
+\newcommand{\sdiag}{\mathrm{diag}}
 
 % TITLE PAGE
 
@@ -107,23 +109,46 @@ while a large harmonic flow indicates that the ordering of items ranked further 
 For example, if the curl flow is large but the harmonic flow is small, this indicates that the ranking is valid at a larger scare,
 but that the specific ordering of closely-ranked alternatives isn't very precise.
 
-\subsection{Computation of Gradient Flow}
+\subsection{Representation of Matrices}
 
-We seek to find $S \in \mathbb{R}^n$ that minimizes $\lvert\lvert \delta_0s - \bar{Y} \rvert\rvert$.
-Such an $s$ must satisfy $\bar{Y} - \delta_0s \in \delta_0^\perp = \sker(\delta_0^*)$.
-Thus $\delta_0^*(\bar{Y} - \delta_0s) = 0 \implies \delta_0^* \delta_0 s = \delta_0 \bar{Y}$.
-Note that $\Delta_0 = \delta_0^* \delta_0$ and $\delta_0^* s = -\sdiv$, thus $s = -\delta_0^+\sdiv Y$.
-We compute the gradient flow as $G = \delta_0s$.
+It is necessary to have matrix representations of $\delta_0$ (grad), $\delta_1$ (curl), $\delta_0^*$, and $delta_1^*$ in order to compute the gradient, curl, and harmonic flows.
+Throughout this section, $f$, $\alpha$, and $A$ refer to maps from edges, vertices, and triples into $\mathbb{R}$, respectively.
 
-\subsection{Computation of Curl Flow}
+\bigskip
 
-We seek a three-dimensional matrix M that minimizes $\lvert\lvert \delta_1*M - \bar{Y} \rvert\rvert$.
-By similar logic, $\scurl \, \scurl^*M = \scurl Y \implies M = (\scurl \, \scurl^*)^{-1} \scurl Y$.
-Thus the curl flow $C = \scurl^* (\scurl \, \scurl^*)^{-1} \scurl Y = \scurl^+ \scurl Y$.
-We represent the curl matrix as a matrix with width $\binom{n}{2}$ and height $\binom{n}{3}$,
-which transforms a vector holding all entries $\bar{Y}[ij]$ s.t. $j>i$ and outputs a vector corresponding to all triples $(i,j,k)$ s.t. $i<j<k$.
-A triple $(i,j,k)$ will be assigned the value $\bar{Y}[ij] + \bar{Y}[jk] + \bar{Y}[ki]$.
-For example, in the case of four variables, we have 
+The gradient operator assigns values to edges based on the difference of the values of the endpoints.
+Specifically, $\alpha((a,b)) = - f(a) + f(b)$.
+For example, when the graph has four vertices and all edge weights are nonzero, the matrix representation of the gradient is
+
+\[
+  \begin{bmatrix}
+    -1 & 1 & 0 & 0 \\
+    -1 & 0 & 1 & 0 \\
+    -1 & 0 & 0 & 1 \\
+    0 & -1 & 1 & 0 \\
+    0 & -1 & 0 & 1 \\
+    0 & 0 & -1 & 1
+  \end{bmatrix}
+  \begin{bmatrix}
+    a \\ b \\ c \\ d
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    ab \\ ac \\ ac \\ bc \\ bd \\ cd
+  \end{bmatrix}
+\]
+
+We can verify the correctness of this matrix by examination.
+For example, the first row corresponds to the edge $(a, b)$ and thus we want $\alpha((a,b)) = - f(a) + f(b)$.
+Indeed, the value $-1$ in the first column corresponds to $a$, and the value $+1$ in the second column corresponds to $b$.
+If any of the edge weights are zero, we remove the corresponding row from the gradient matrix.
+For example, if $W((a,b)) = 0$, we would remove the first row from the matrix above.
+
+\bigskip
+
+The curl operator assigns values to triples based off the values of edges.
+Specifically, $A((a,b,c)) = \alpha(b,c) - \alpha(a,c) + \alpha(a,b)$.
+For example, when the graph has four vertices and all edge weights are nonzero, the matrix representation of the curl is:
 
 \[
   \begin{bmatrix}
@@ -142,14 +167,58 @@ For example, in the case of four variables, we have
 \]
 
 To check correctness, we examine the triple $(a,b,c)$.
-This triple is assigned the value $\bar{Y}[ab] - \bar{Y}[ac] + \bar{Y}[bc]$.
-This equals $\bar{Y}[ac] + \bar{Y}[bc] + \bar{Y}[ca]$, as $- \bar{Y}[ac] = \bar{Y}[ca]$ since $\bar{Y}$ is symmetric.
-This is the curl, as we expect.
+We would want to assign this triple the value $\alpha((b,c)) - \alpha((a,c)) + \alpha((b,c))$.
+We can verify that indeed the row corresponding to edge $(a,b)$ has values $+1$, $-1$, and $+1$ at the columns corresponding to the edges $(b,c)$, $(a,c)$, and $(b,c)$.
+If any of the edge weights are zero, we remove the corresponding column from the matrix.
+If any of the triples contain an edge with zero weight, we remove the corresponding row from the matrix.
 
-\subsection{Computation of Harmonic Flow}
+\bigskip
 
-\underline{Harmonic flow:}
-The Hodge decomposition theorem provides that $\bar{Y} = G + H + C$, thus we compute $H$ as $\bar{Y} - G - H$.
+We now compute $\delta_0^*$ and $\delta_1^*$.
+Let $M_{\delta_0^*}$ and $M_{\delta_0}$ denote the matrix representations of $\delta_0^*$ and $\delta_0$, respectively.
+By definition of the adjoint operator, we must have that:
+\begin{equation}\label{equation:gradAdj}
+<\delta_0f,\alpha> = <f,\delta_0^*\alpha>
+\end{equation}
+$\delta_0f$ and $\alpha$ are in $C^1$, thus their inner product includes multiplication by edge weights, and is computed as $\sum_{i,j}(\delta_0f)_{ij}\alpha_{ij}W_{ij}$.
+$f$ and $\delta_0^*$ are in $C^0$, thus their inner product does not include edge weights.
+So in order for \ref{equation:gradAdj} to be valid, we need $\delta_0^*$ to include multiplication by edge weights.
+Then multiplying the rows of $M_{\delta_0}$ by the corresponding edge weights and transposing the result will yield $M_{\delta_0^*}$.
+Specifically, $M_{\delta_0^*} = (D M_{\delta_0})^T$ where $D = \sdiag(W_{ij})$ for all nonzero edges $(i,j)$.
+
+\bigskip
+
+Similarly, in the case of the curl operator we must have:
+\begin{equation}\label{equation:curlAdj}
+<\delta_1\alpha,A> = <\alpha,\delta_1^*A>
+\end{equation}
+This time $\alpha$ and $\delta_1^*A$ are in $C^1$ while $\delta_1\alpha$ and $A$ are in $C^2$.
+Thus only the inner product $<\alpha, \delta_1^*A>$ includes multiplication by edge weights.
+Then dividing the rows of $M_{\delta_1}$ by the corresponding edge weights and transposing the result will yield $M_{\delta_1^*}$.
+Specifically, $M_{\delta_1^*} = (M_{\delta_1} D')^T$ where $D' = \sdiag(\frac{1}{W_{ij}})$ for all nonzero edges $(i,j)$.
+
+\subsection{Computation of the Gradient, Curl, and Harmonic Flows}
+
+Having defined the necessary matrix representations, we are ready to compute the three flows, which we denots $G$, $C$, and $H$.
+The gradient flow is the orthogonal projection of $Y$ onto $\ssim(\delta_0)$.
+So $G = \delta_0(\delta_0^*\delta_0)^+\delta_0^*Y$, where $^+$ denotes the Moore-Penrose pseudo-inverse.
+
+\bigskip
+
+The curl flow is the orthogonal projection on to $\ssim(\delta_1^*)$.
+We thus hope to find $A \in C^2$ which is the least squares solution to $Y = \delta_1^*A$.
+Note that this equation is in the inner product space $C_1$ which includes multiplication by edge weights.
+To solve this equation in the standard inner product space, it is equivalent to multiply both sides by $\sqrt{D}$, and solve $\sqrt{D}Y = \sqrt{D}\delta_1^*A$, where $D = \sdiag(W_{ij})$.
+Then $C = \delta_1^*A$.
+
+\bigskip
+
+The harmonic flow is $\sker \delta_0^* \cap \sker \delta_1 = \sker \Delta_1$ where $\Delta_1 = \delta_1^*\delta_1 + \delta_0\delta_0^*$.
+Then $D\Delta_1 = \Delta_1^T D$.
+So $D^{1/2}\Delta_1D^{-1/2} = D^{-1/2}\Delta_1^TD^{1/2}$.
+So $S = D^{1/2}\Delta_1D^{-1/2}$ is symmetric, and we can compute its pseudo-inverse.
+We thus have that the matrix representation of the projection in to $\sker \Delta_1$ is $P = D^{1/2}(S^+S)D^{1/2}$.
+So $H = (I - P)Y$.
 
 \section{Application of Helmholtz Decomposition}
 
