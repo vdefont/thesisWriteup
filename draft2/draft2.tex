@@ -222,6 +222,38 @@ So $H = (I - P)Y$.
 
 \section{Application of Helmholtz Decomposition}
 
+We apply Helmholtz decomposition to a dataset of matches from all major professional tennis tournaments in 2017.
+There are 528 players and 3831 matches.
+Each match functions as a comparison between two players.
+We experiment with four different weighting methods:
+
+\begin{enumerate}
+\item "Uniform" : All matches are weighted equally
+\item "Sets" : A match is weighted by the number of sets played
+\item "Games" : A match is weighted by the number of games played
+\item "Tourney" : A match is weighted more if it is played in a later round in the tournament. Final-round matches have a weight of 1, semifinal matches a weight of 0.5, quarterfinal matches a weight of 0.25, and so on.
+\end{enumerate}
+
+We take a subset of the data consisting of only those matches involving the top 50 players as chosen using "uniform" weighting.
+We apply Helmholtz decomposition to this smaller dataset using each of the four different weighting methods.
+We then compare the three flows for each weighting method, where the flows are represented as their fraction of the whole matrix Y, using the Frobenius norm with respect to the $C^1$ inner product $<A,B> = \sum_{i,j}A_{ij}B_{ij}W_{ij}$.
+The results are as follows:
+
+\begin{center}
+\begin{tabular}{c | c c c}
+Weighting Method & Gradient & Curl & Harmonic \\
+\hline
+Uniform & 0.368911 & 0.630049 & 0.001040 \\
+Sets & 0.361733 & 0.637242 & 0.001025 \\
+Games & 0.351814 & 0.646887 & 0.001299 \\
+Tourney & 0.424746 & 0.574440 & 0.000814 \\
+\end{tabular}
+\end{center}
+
+Note that all weighting methods produce similar results except for "tourney," in which case the gradient flow is higher and the curl flow lower.
+This suggests that "tourney" weighting allows for the most consistent ranking of players.
+This is not intuitive: we would not expect a match to be more reflective of the payers' true skill just because it occurs in a later round.
+
 \end{chapter}
 
 
