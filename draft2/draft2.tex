@@ -3,6 +3,7 @@
 \newcommand{\sdiv}{\mathrm{div}}
 \newcommand{\scurl}{\mathrm{curl}}
 \newcommand{\sker}{\mathrm{ker}}
+\newcommand{\sgrad}{\mathrm{grad}}
 \newcommand{\ssim}{\mathrm{im}}
 \newcommand{\sdiag}{\mathrm{diag}}
 
@@ -62,7 +63,7 @@ Calculating the eigenvalues of the laplacian matrix reduces the dimension of the
 
 Papers by Gunnar Carlsson \cite{carlssonMain} and Vin de Silva \cite{deSilvaCohomology} explain the intuition behind cohomolgy analysis, and provides several examples. Carlsson \cite{carlssonCompute} and deSilva \cite{deSilvaCohomology} also describe the algorithm used to compute cohomology, which will be useful if I choose to implement it.
 
-Curto \cite{curto} and Ulmer \cite{biologicalModels} both provide various examples of the uses of homology analysis, both in detecting underlying structure, and in providing fingerprints that identify different phenomena. Curto analyzes a dataset representing connection strengths between neurons in rats responsible for spatial recognition. Curto first keeps a certain proportion of edges $\rho$ s.t. $0<\rho<1$, keeping those edges which are the strongest. Curto then runs cohomology analysis on this graph to determine the Betti curve. Curto determined that the Betti curve obtained from spatially organized neurons is different than the Betti curve that would be obtained from neurons with random structure. Cohomolgy analysis thus provides a method for detecting spatial neurons. Ulmer uses cohomology analysis to evaluate two different models of social interaction for aphids roaming in a dish. Standard measures that compare the models to real data include angular momentum, and average distance to closest neighbor. Ulmer found that cohomology analysis provided an equally strong measurement for assessing model accuracy.
+Curto \cite{curto} and Ulmer \cite{biologicalModels} both provide various examples of the uses of homology analysis, both in detecting underlying structure, and in providing fingerprints that identify different phenomena. Curto analyzes a dataset representing connection strengths between neurons in rats responsible for spatial recognition. Curto first keeps a certain proportion of edges $\rho$ s.t. $0\langle\rho\langle1$, keeping those edges which are the strongest. Curto then runs cohomology analysis on this graph to determine the Betti curve. Curto determined that the Betti curve obtained from spatially organized neurons is different than the Betti curve that would be obtained from neurons with random structure. Cohomolgy analysis thus provides a method for detecting spatial neurons. Ulmer uses cohomology analysis to evaluate two different models of social interaction for aphids roaming in a dish. Standard measures that compare the models to real data include angular momentum, and average distance to closest neighbor. Ulmer found that cohomology analysis provided an equally strong measurement for assessing model accuracy.
 
 A paper by Jiang \cite{hodge} explains the Helmholtz decomposition that converts ranked data into ordinal data. It provides both the algorithm for the decomposition, as well as three examples of its use. Jiang uses Helmholtz decomposition to rank movies. Most users rate several movies, so each time a user rated two movies, this introduced an edge from one movie to the other indicating the user's preference. Jiang used Helmholtz decomposition to create an absolute index of currency values based off trading rates. Jiang also used Helmholtz decomposition to rank websites based off of connection strengths. Jiang found that Helmholtz decomposition performed as well as some of the standard methods for website ranking, indicating that it is a useful tool.
 
@@ -79,6 +80,47 @@ Singh \cite{laplacian} describes the intuition behind the laplacian analysis, wh
 \label{chapter:helmholtz}
 
 \section{Explanation of Helmholtz Decomposition}
+
+\subsection{Motivation}
+
+Suppose we have three tennis players: Anne, Bob, and Carl.
+Let us represent the matches they play by a matrix $\bar{Y}$.
+Then
+
+\[
+  \bar{Y}
+  =
+  \begin{bmatrix}
+    0 & -2 & -3 \\
+    2 & 0 & -4 \\
+    3 & 4 & 0
+  \end{bmatrix}
+\]
+
+means that Anne beat Bob by 2, Anne beat Carl by 3, and Bob beat Carl by 4.
+Suppose further that we have a second matrix $W$ which represents the number of matches played.
+Then
+
+\[
+  W
+  =
+  \begin{bmatrix}
+    0 & 1 & 2 \\
+    1 & 0 & 3 \\
+    2 & 3 & 0
+  \end{bmatrix}
+\]
+
+Means that Anne and Bob played 1 match, Anne and Carl played 2 matches, and Bob and Carl played 3 matches.
+We would like to assign a numerical rating to all three players that best accounts for their respective match scores.
+For example, if Anne, Bob, and Carl receive respective ratings of 5, 3, and 2, then this would perfectly account for the matches (Anne, Bob) and (Anne, Carl), but would not account for the match (Bob, Carl).
+
+\bigskip
+
+More generally, we consider any skew-symmetric matrix $\bar{Y} \in M_n$ (recall that $A \in M_n$ is skew-symmetric when $A^T = -A$) along with a symmetric matrix $W$.
+We would like to find a vector $s \in M_{nx1}$ that minimizes $\lvert \lvert \sgrad s - \bar{Y} \rvert \rvert_{2,W}$.
+Note that the norm is computed with respect to the inner product space defined by $W$.
+More precisely, $\langle X, Y\rangle_W = \Sigma_{\{i,j\} \in E} w_{ij}X_{ij}Y_{ij}$.
 
 \subsection{Intuition}
 
@@ -178,7 +220,7 @@ We now compute $\delta_0^*$ and $\delta_1^*$.
 Let $M_{\delta_0^*}$ and $M_{\delta_0}$ denote the matrix representations of $\delta_0^*$ and $\delta_0$, respectively.
 By definition of the adjoint operator, we must have that:
 \begin{equation}\label{equation:gradAdj}
-<\delta_0f,\alpha> = <f,\delta_0^*\alpha>
+\langle \delta_0f,\alpha\rangle = \langle f,\delta_0^*\alpha \rangle
 \end{equation}
 $\delta_0f$ and $\alpha$ are in $C^1$, thus their inner product includes multiplication by edge weights, and is computed as $\sum_{i,j}(\delta_0f)_{ij}\alpha_{ij}W_{ij}$.
 $f$ and $\delta_0^*$ are in $C^0$, thus their inner product does not include edge weights.
@@ -190,10 +232,10 @@ Specifically, $M_{\delta_0^*} = (D M_{\delta_0})^T$ where $D = \sdiag(W_{ij})$ f
 
 Similarly, in the case of the curl operator we must have:
 \begin{equation}\label{equation:curlAdj}
-<\delta_1\alpha,A> = <\alpha,\delta_1^*A>
+\langle\delta_1\alpha,A\rangle = \langle\alpha,\delta_1^*A\rangle
 \end{equation}
 This time $\alpha$ and $\delta_1^*A$ are in $C^1$ while $\delta_1\alpha$ and $A$ are in $C^2$.
-Thus only the inner product $<\alpha, \delta_1^*A>$ includes multiplication by edge weights.
+Thus only the inner product $\langle\alpha, \delta_1^*A\rangle$ includes multiplication by edge weights.
 Then dividing the rows of $M_{\delta_1}$ by the corresponding edge weights and transposing the result will yield $M_{\delta_1^*}$.
 Specifically, $M_{\delta_1^*} = (M_{\delta_1} D')^T$ where $D' = \sdiag(\frac{1}{W_{ij}})$ for all nonzero edges $(i,j)$.
 
@@ -225,18 +267,20 @@ So $H = (I - P)Y$.
 We apply Helmholtz decomposition to a dataset of matches from all major professional tennis tournaments in 2017.
 There are 528 players and 3831 matches.
 Each match functions as a comparison between two players.
+The entries in the $\bar{Y}$ matrix are computed as the fraction of games the winner won minus $0.5$.
+For example, if player B won $0.7$ of the games in a match against player A, the entry at index (A, B) in $\bar{Y}$ would be $0.7 - 0.5 = 0.2$.
 We experiment with four different weighting methods:
 
 \begin{enumerate}
-\item "Uniform" : All matches are weighted equally
-\item "Sets" : A match is weighted by the number of sets played
-\item "Games" : A match is weighted by the number of games played
-\item "Tourney" : A match is weighted more if it is played in a later round in the tournament. Final-round matches have a weight of 1, semifinal matches a weight of 0.5, quarterfinal matches a weight of 0.25, and so on.
+\item ``Uniform'' : All matches are weighted equally
+\item ``Sets'' : A match is weighted by the number of sets played
+\item ``Games'' : A match is weighted by the number of games played
+\item ``Tourney'' : A match is weighted more if it is played in a later round in the tournament. Final-round matches have a weight of 1, semifinal matches a weight of 0.5, quarterfinal matches a weight of 0.25, and so on.
 \end{enumerate}
 
-We take a subset of the data consisting of only those matches involving the top 50 players as chosen using "uniform" weighting.
+We take a subset of the data consisting of only those matches involving the top 50 players as chosen using ``uniform'' weighting.
 We apply Helmholtz decomposition to this smaller dataset using each of the four different weighting methods.
-We then compare the three flows for each weighting method, where the flows are represented as their fraction of the whole matrix Y, using the Frobenius norm with respect to the $C^1$ inner product $<A,B> = \sum_{i,j}A_{ij}B_{ij}W_{ij}$.
+We then compare the three flows for each weighting method, where the flows are represented as their fraction of the whole matrix Y, using the Frobenius norm with respect to the $C^1$ inner product $\langle A,B\rangle = \sum_{i,j}A_{ij}B_{ij}W_{ij}$.
 The results are as follows:
 
 \begin{center}
@@ -250,8 +294,8 @@ Tourney & 0.424746 & 0.574440 & 0.000814 \\
 \end{tabular}
 \end{center}
 
-Note that all weighting methods produce similar results except for "tourney," in which case the gradient flow is higher and the curl flow lower.
-This suggests that "tourney" weighting allows for the most consistent ranking of players.
+Note that all weighting methods produce similar results except for ``tourney,'' in which case the gradient flow is higher and the curl flow lower.
+This suggests that ``tourney'' weighting allows for the most consistent ranking of players.
 This is not intuitive: we would not expect a match to be more reflective of the payers' true skill just because it occurs in a later round.
 
 \end{chapter}
@@ -316,45 +360,45 @@ This is not intuitive: we would not expect a match to be more reflective of the 
 
 \bibitem{carlssonMain}
 Carlsson, Gunnar.
-"Topology and data."
+``Topology and data.''
 \textit{Bulletin of the American Mathematical Society}
 46.2 (2009): 255-308.
 
 \bibitem{carlssonCompute}
 Zomorodian, Afra, and Gunnar Carlsson.
-"Computing persistent homology."
+``Computing persistent homology.''
 \textit{Discrete \& Computational Geometry}
 33.2 (2005): 249-274.
 
 \bibitem{deSilvaCohomology}
 De Silva, Vin, Dmitriy Morozov, and Mikael Vejdemo-Johansson.
-"Persistent cohomology and circular coordinates."
+``Persistent cohomology and circular coordinates.''
 \textit{Discrete \& Computational Geometry}
 45.4 (2011): 737-759.
 
 
 \bibitem{curto}
 Giusti, Chad, et al.
-"Clique topology reveals intrinsic geometric structure in neural correlations."
+``Clique topology reveals intrinsic geometric structure in neural correlations.''
 \textit{Proceedings of the National Academy of Sciences}
 112.44 (2015): 13455-13460.
 
 \bibitem{biologicalModels}
 Ulmer, M., Lori Ziegelmeier, and Chad M. Topaz.
-"Assessing biological models using topological data analysis."
+``Assessing biological models using topological data analysis.''
 \textit{arXiv preprint arXiv:1811.04827}
 (2018).
 
 
 \bibitem{hodge} 
-Jiang, Xiaoye, et al. "Statistical ranking and combinatorial Hodge theory."
+Jiang, Xiaoye, et al. ``Statistical ranking and combinatorial Hodge theory.''
 \textit{Mathematical Programming}
 127.1 (2011): 203-244.
 
 
 \bibitem{laplacian}
 Singh, Gurjeet, Facundo Mémoli, and Gunnar E. Carlsson.
-"Topological methods for the analysis of high dimensional data sets and 3d object recognition."
+``Topological methods for the analysis of high dimensional data sets and 3d object recognition.''
 \textit{SPBG.}
 2007.
 

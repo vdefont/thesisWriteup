@@ -5,18 +5,19 @@
 \contentsline {chapter}{\numberline {2}Review of Literature}{3}{chapter.2}
 \contentsline {chapter}{\numberline {3}Helmholtz Decomposition}{5}{chapter.3}
 \contentsline {section}{\numberline {3.1}Explanation of Helmholtz Decomposition}{5}{section.3.1}
-\contentsline {subsection}{\numberline {3.1.1}Intuition}{5}{subsection.3.1.1}
-\contentsline {subsection}{\numberline {3.1.2}Representation of Matrices}{6}{subsection.3.1.2}
-\contentsline {subsection}{\numberline {3.1.3}Computation of the Gradient, Curl, and Harmonic Flows}{8}{subsection.3.1.3}
-\contentsline {section}{\numberline {3.2}Application of Helmholtz Decomposition}{8}{section.3.2}
-\contentsline {chapter}{\numberline {4}Cohomology Analysis}{10}{chapter.4}
-\contentsline {section}{\numberline {4.1}Explanation of Cohomology Analysis}{10}{section.4.1}
-\contentsline {section}{\numberline {4.2}Application of Cohomology Analysis}{10}{section.4.2}
-\contentsline {chapter}{\numberline {5}Mapper}{11}{chapter.5}
-\contentsline {section}{\numberline {5.1}Explanation of Mapper}{11}{section.5.1}
-\contentsline {section}{\numberline {5.2}Explanation of Mapper}{11}{section.5.2}
-\contentsline {chapter}{\numberline {6}Laplacian Eigenvector Analysis}{12}{chapter.6}
-\contentsline {section}{\numberline {6.1}Explanation of Laplacian Eigenvector Analysis}{12}{section.6.1}
-\contentsline {section}{\numberline {6.2}Application of Laplacian Eigenvector Analysis}{12}{section.6.2}
-\contentsline {chapter}{\numberline {7}Discussion}{13}{chapter.7}
-\contentsline {chapter}{\numberline {8}Conclusion}{14}{chapter.8}
+\contentsline {subsection}{\numberline {3.1.1}Motivation}{5}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Intuition}{6}{subsection.3.1.2}
+\contentsline {subsection}{\numberline {3.1.3}Representation of Matrices}{7}{subsection.3.1.3}
+\contentsline {subsection}{\numberline {3.1.4}Computation of the Gradient, Curl, and Harmonic Flows}{8}{subsection.3.1.4}
+\contentsline {section}{\numberline {3.2}Application of Helmholtz Decomposition}{9}{section.3.2}
+\contentsline {chapter}{\numberline {4}Cohomology Analysis}{11}{chapter.4}
+\contentsline {section}{\numberline {4.1}Explanation of Cohomology Analysis}{11}{section.4.1}
+\contentsline {section}{\numberline {4.2}Application of Cohomology Analysis}{11}{section.4.2}
+\contentsline {chapter}{\numberline {5}Mapper}{12}{chapter.5}
+\contentsline {section}{\numberline {5.1}Explanation of Mapper}{12}{section.5.1}
+\contentsline {section}{\numberline {5.2}Explanation of Mapper}{12}{section.5.2}
+\contentsline {chapter}{\numberline {6}Laplacian Eigenvector Analysis}{13}{chapter.6}
+\contentsline {section}{\numberline {6.1}Explanation of Laplacian Eigenvector Analysis}{13}{section.6.1}
+\contentsline {section}{\numberline {6.2}Application of Laplacian Eigenvector Analysis}{13}{section.6.2}
+\contentsline {chapter}{\numberline {7}Discussion}{14}{chapter.7}
+\contentsline {chapter}{\numberline {8}Conclusion}{15}{chapter.8}
